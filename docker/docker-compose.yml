@@ -3,9 +3,9 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: agentbridge
+      POSTGRES_PASSWORD: 
+      POSTGRES_USER: 
+      POSTGRES_DB: 
     ports:
       - "5432:5432"
     volumes:
