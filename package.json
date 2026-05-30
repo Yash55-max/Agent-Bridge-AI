@@ -1,0 +1,14 @@
+{
+  "name": "agent-bridge",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "pnpm --filter @agentbridge/web dev",
+    "dev:api": "cd apps/api && uvicorn app.main:app --reload --port 8000"
+  }
+}
