@@ -1,0 +1,4 @@
+{
+  "buildCommand": "pnpm --filter @agentbridge/web build",
+  "installCommand": "pnpm install"
+}
