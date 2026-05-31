@@ -1,14 +1,18 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from ...services.agent_orchestrator import AgentOrchestrator
-import os
 import json
+from pathlib import Path
 
 router = APIRouter()
 orch = AgentOrchestrator()
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "data")
-SESSIONS_DIR = os.path.join(DATA_DIR, "sessions")
-os.makedirs(SESSIONS_DIR, exist_ok=True)
+DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+SESSIONS_DIR = DATA_DIR / "sessions"
+
+
+def _ensure_sessions_dir() -> Path:
+    SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
+    return SESSIONS_DIR
 
 
 class AgentConfig(BaseModel):
@@ -31,8 +35,8 @@ async def start_session(req: StartSessionReq):
             {"name": "Agent 2: The Supervisor", "role": "supervisor", "goal": "Check protocol steps, validate outputs, and format the final result."},
         ]
     session_id = await orch.start_session(req.server_url, agents)
-    path = os.path.join(SESSIONS_DIR, f"{session_id}.json")
-    with open(path, "w", encoding="utf-8") as f:
+    path = _ensure_sessions_dir() / f"{session_id}.json"
+    with path.open("w", encoding="utf-8") as f:
         json.dump({"session_id": session_id, "server_url": req.server_url, "agents": agents, "events": []}, f, indent=2)
     return {"session_id": session_id}
 
@@ -45,10 +49,10 @@ async def get_events(session_id: str):
 
 @router.get("/sandbox/{session_id}/replay")
 async def replay(session_id: str):
-    path = os.path.join(SESSIONS_DIR, f"{session_id}.json")
-    if not os.path.exists(path):
+    path = _ensure_sessions_dir() / f"{session_id}.json"
+    if not path.exists():
         raise HTTPException(status_code=404, detail="not found")
-    with open(path, "r", encoding="utf-8") as f:
+    with path.open("r", encoding="utf-8") as f:
         return json.load(f)
 
 
