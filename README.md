@@ -33,6 +33,16 @@ The active deployment stack is:
 - MCP tool discovery and tool calls for calculator-style demo actions.
 - Render and Vercel deployment support.
 
+## Screenshots
+
+### Workspace overview
+
+![AgentBridge AI workspace screenshot](screen.png)
+
+Source: @file:screen.png
+
+The screenshot above shows the main workspace with prompt-to-code generation, the live agent sandbox, and the output console.
+
 ## Repository layout
 
 - `frontend/` - Next.js application and UI components.
