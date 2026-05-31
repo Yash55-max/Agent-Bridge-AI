@@ -1,5 +1,12 @@
 # AgentBridge AI
 
+[![Next.js](https://img.shields.io/badge/Next.js-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![Render](https://img.shields.io/badge/Render-2D2D2D?logo=render&logoColor=white)](https://render.com/)
+[![Vercel](https://img.shields.io/badge/Vercel-000000?logo=vercel&logoColor=white)](https://vercel.com/)
+
 AgentBridge AI is a full-stack application for turning plain-English prompts into MCP-style FastAPI services, previewing the generated output, and running live sandbox analysis against the deployed result.
 
 The active deployment stack is:
