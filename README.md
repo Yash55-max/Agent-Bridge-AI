@@ -39,7 +39,7 @@ The active deployment stack is:
 
 ![AgentBridge AI workspace screenshot](screen.png)
 
-Source: @file:screen.png
+Source: [screen.png](screen.png)
 
 The screenshot above shows the main workspace with prompt-to-code generation, the live agent sandbox, and the output console.
 
