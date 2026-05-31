@@ -50,6 +50,7 @@ frontend/node_modules/
 backend/.venv/
 frontend/.vscode/
 frontend/app/*.css.d.ts
+!frontend/app/globals.css.d.ts
 frontend/.vscode/*.d.ts
 docker/secrets/
 *.tsbuildinfo
