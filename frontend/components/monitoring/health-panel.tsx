@@ -1,4 +1,10 @@
-export function HealthPanel({ sandbox }: { sandbox: { agents: number; latencyMs: number } }) {
+export function HealthPanel({
+  status,
+  sandbox,
+}: {
+  status: string;
+  sandbox: { agents: number; latencyMs: number };
+}) {
   return (
     <article className="panel health-panel">
       <header className="panel-header compact">
@@ -8,7 +14,9 @@ export function HealthPanel({ sandbox }: { sandbox: { agents: number; latencyMs:
       <div className="health-grid">
         <div>
           <p className="muted">Server Status</p>
-          <p className="health-value status-good">Active</p>
+          <p className={`health-value ${status === "ready" || status === "running" ? "status-good" : "status-warn"}`}>
+            {status}
+          </p>
         </div>
         <div>
           <p className="muted">Latency</p>
@@ -19,8 +27,8 @@ export function HealthPanel({ sandbox }: { sandbox: { agents: number; latencyMs:
           <p className="health-value">{sandbox.agents}</p>
         </div>
         <div>
-          <p className="muted">Region</p>
-          <p className="health-value small">US-East-1</p>
+          <p className="muted">Tools</p>
+          <p className="health-value small">Live from preview API</p>
         </div>
       </div>
     </article>

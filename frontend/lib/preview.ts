@@ -39,8 +39,8 @@ export const outputLines = [
 ];
 
 export const defaultPreview: PreviewPayload = {
-  name: "AgentBridge MCP",
-  status: "running",
+  name: "No generation yet",
+  status: "idle",
   tools: [],
   sandbox: {
     agents: 0,
@@ -50,14 +50,8 @@ export const defaultPreview: PreviewPayload = {
 };
 
 export async function loadPreview(): Promise<PreviewPayload> {
-  const baseUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-  if (!baseUrl) {
-    return defaultPreview;
-  }
-
   try {
-    const response = await fetch(`${baseUrl.replace(/\/$/, "")}/api/v1/preview`, {
+    const response = await fetch(`/api/preview`, {
       cache: "no-store",
     });
 

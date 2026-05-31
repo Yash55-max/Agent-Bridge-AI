@@ -26,9 +26,17 @@ services:
       DATABASE_URL: postgresql+psycopg://postgres:postgres@postgres:5432/agentbridge
       CORS_ORIGINS: '["http://localhost:3000"]'
       ENVIRONMENT: development
+      # LLM provider settings (Groq preferred)
+      LLM_PROVIDER: ${LLM_PROVIDER:-groq}
+      # Groq API key will be provided via docker secret (mounted at /run/secrets/groq_api_key)
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      GROQ_API_URL: ${GROQ_API_URL:-}
+      GROQ_MODEL: ${GROQ_MODEL:-llama-3.1-8b-instant}
     depends_on:
       - postgres
       - redis
+    secrets:
+      - groq_api_key
 
   web:
     build:
@@ -49,3 +57,7 @@ services:
 
 volumes:
   pgdata:
+
+secrets:
+  groq_api_key:
+    file: ./docker/secrets/groq_api_key

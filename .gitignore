@@ -3,6 +3,11 @@ node_modules/
 .next/
 .turbo/
 out/
+.pnpm-store/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
 
 # Python
 __pycache__/
@@ -12,27 +17,50 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.coverage
+htmlcov/
 .venv/
 venv/
 env/
+*.egg-info/
 
 # Environment files
 .env
 .env.*
 !.env.example
+!.env.sample
 
 # Build / coverage artifacts
 dist/
 build/
 coverage/
 *.log
+*.sqlite
+*.sqlite3
+*.db
+*.tmp
+*.bak
 
 # Local app data
 apps/api/data/
 backend/data/
+backend/app/data/
 frontend/.next/
 frontend/node_modules/
 backend/.venv/
+frontend/.vscode/
+frontend/app/*.css.d.ts
+frontend/.vscode/*.d.ts
+docker/secrets/
+*.tsbuildinfo
+
+# IDEs / editors
+.idea/
+*.suo
+*.user
+*.userosscache
+*.swp
+*.swo
 
 # OS / editor junk
 .DS_Store

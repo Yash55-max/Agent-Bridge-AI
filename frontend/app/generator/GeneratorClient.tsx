@@ -16,20 +16,25 @@ export default function GeneratorClient() {
       const res = await fetch(`/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description }),
+        body: globalThis.JSON.stringify({ description }),
       });
       const data = await res.json();
-      const code = data.generated_code ?? JSON.stringify(data, null, 2);
+      const code = data.generated_code ?? globalThis.JSON.stringify(data, null, 2);
       setResult(code);
+      try {
+        window.localStorage.setItem("agentbridge.generated_code", code);
+        if (data.server_name) {
+          window.localStorage.setItem("agentbridge.server_name", `${data.server_name}`);
+        }
+      } catch {}
       // Emit event so other panels (output) can pick up the generated code
       try {
-        // @ts-ignore - window may not exist in some SSR contexts
-        window.dispatchEvent(new CustomEvent("generated", { detail: { generated_code: code } }));
-      } catch (e) {
+        window.dispatchEvent(new CustomEvent("generated", { detail: { generated_code: code, ...data } }));
+      } catch {
         // ignore
       }
     } catch (err) {
-      setResult(String(err));
+      setResult(`${err}`);
     } finally {
       setLoading(false);
     }
@@ -37,7 +42,7 @@ export default function GeneratorClient() {
 
   return (
     <div style={{ padding: 16 }}>
-      <h2>Generator (MVP)</h2>
+      <h2>Generator</h2>
       <form onSubmit={handleSubmit}>
         <textarea
           rows={6}
@@ -52,6 +57,10 @@ export default function GeneratorClient() {
           </button>
         </div>
       </form>
+
+      {result ? (
+        <pre style={{ marginTop: 12, maxHeight: 320, overflow: "auto" }}>{result}</pre>
+      ) : null}
     </div>
   );
 }

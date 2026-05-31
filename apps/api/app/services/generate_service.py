@@ -6,7 +6,6 @@ from pathlib import Path
 import httpx
 
 from app.core.config import get_settings
-import re
 
 
 SYSTEM_PROMPT = (
@@ -86,19 +85,9 @@ def _extract_text(response_body: object) -> str:
 
 
 def _stub_response(prompt: str, reason: str) -> dict:
-    # Prefer returning the bundled calculator MCP template if present
-    tpl_path = Path(__file__).parent.parent / "mcp_templates" / "calculator_mcp.py"
-    if tpl_path.exists():
-        try:
-            code = tpl_path.read_text(encoding="utf-8")
-        except Exception:
-            code = "# Failed to read local template\n"
-    else:
-        code = "# Generation unavailable locally\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get('/health')\nasync def health():\n    return {'status': 'ok'}\n"
-
     return {
         "server_name": "generated_server_stub",
-        "generated_code": code,
+        "generated_code": """# Generation unavailable locally\nfrom fastapi import FastAPI\n\napp = FastAPI()\n\n@app.get('/health')\nasync def health():\n    return {'status': 'ok'}\n""",
         "model": "local-stub",
         "provider": "local",
         "note": f"{reason} Prompt preserved: {prompt}",
@@ -120,6 +109,7 @@ def generate_mcp_server(prompt: str) -> dict:
     if want_groq and not groq_key:
         return _stub_response(prompt, "Groq provider selected but GROQ_API_KEY is missing.")
 
+    # Prefer Groq if configured or explicitly requested
     if groq_key or want_groq:
         try:
             url = settings.groq_api_url or "https://api.groq.com/openai/v1/chat/completions"
@@ -140,69 +130,3 @@ def generate_mcp_server(prompt: str) -> dict:
             return _stub_response(prompt, f"Groq API unavailable: {exc}")
     # No other providers configured or Groq failed — return stub
     return _stub_response(prompt, "No LLM provider available or all providers failed.")
-
-
-def call_groq(prompt_text: str) -> str:
-    """Call Groq (or configured provider) with an arbitrary prompt and return text.
-
-    This function provides two fallbacks when Groq is not available:
-    - If no API key is configured, returns a lightweight JSON summary built from the prompt.
-    - Normalizes simple PowerShell hashtable strings into JSON text when detected.
-    """
-    settings = get_settings()
-    groq_key = settings.groq_api_key
-
-    def _normalize_ps_hashtable(s: str) -> str:
-        s = s.strip()
-        if s.startswith("@{") and s.endswith("}"):
-            inner = s[2:-1].strip()
-            if not inner:
-                return "{}"
-            parts = re.split(r";\s*", inner)
-            obj = {}
-            for part in parts:
-                if not part:
-                    continue
-                if "=" in part:
-                    k, v = part.split("=", 1)
-                    k = k.strip()
-                    v = v.strip()
-                    if "System.Object[]" in v or v.endswith("[]"):
-                        obj[k] = []
-                    else:
-                        obj[k] = v
-                else:
-                    obj[part] = None
-            try:
-                return json.dumps(obj)
-            except Exception:
-                return str(obj)
-        return s
-
-    if not groq_key:
-        # Lightweight local summarizer fallback: produce JSON with summary and paragraphs
-        paras = [p.strip() for p in re.split(r"\n\n+", prompt_text) if p.strip()]
-        summary = paras[0] if paras else ""
-        final = {"summary": summary, "paragraphs": paras[:6], "raw_prompt_excerpt": paras[:3]}
-        return json.dumps(final)
-
-    try:
-        url = settings.groq_api_url or "https://api.groq.com/openai/v1/chat/completions"
-        headers = {"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"}
-        payload = {
-            "model": settings.groq_model,
-            "messages": [
-                {"role": "system", "content": "You are an intelligent assistant."},
-                {"role": "user", "content": prompt_text},
-            ],
-            "max_tokens": 512,
-            "temperature": 0.2,
-        }
-        with httpx.Client(timeout=30.0) as client:
-            r = client.post(url, json=payload, headers=headers)
-            r.raise_for_status()
-            body = r.json()
-            text = _extract_text(body)
-            return _normalize_ps_hashtable(text)
-    except Exception:
-        return ""

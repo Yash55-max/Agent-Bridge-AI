@@ -18,7 +18,7 @@ export default async function WorkspacePage() {
 
         <section className="center-pane">
           <GeneratorPanel />
-          <HealthPanel sandbox={preview.sandbox} />
+          <HealthPanel status={preview.status} sandbox={preview.sandbox} />
           <OutputPanel />
         </section>
 

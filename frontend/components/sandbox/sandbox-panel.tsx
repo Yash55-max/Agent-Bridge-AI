@@ -29,7 +29,7 @@ export function SandboxPanel({
       </header>
 
       <div className="sandbox-grid">
-        {agents.map((card) => (
+        {(agents as AgentCard[]).map((card: AgentCard) => (
           <article key={card.title} className={`agent-card ${card.accent}`}>
             <div className="agent-card-head">
               <div className="agent-avatar">✦</div>
@@ -46,8 +46,8 @@ export function SandboxPanel({
           <div className="node-icon">⟡</div>
           <h3>{preview.name}</h3>
           <div className="chip-row">
-            {preview.tools.map((tool) => (
-              <span key={tool}>{tool.replaceAll("_", " ").toUpperCase()}</span>
+            {(preview.tools as string[]).map((tool: string) => (
+              <span key={tool}>{tool.split("_").join(" ")}</span>
             ))}
           </div>
           <div className="progress-track">

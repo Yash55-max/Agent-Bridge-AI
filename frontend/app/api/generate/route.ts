@@ -1,23 +1,23 @@
-import { NextResponse } from "next/server";
-
 export async function POST(request: Request) {
-  const body = await request.json();
+  const body = await request.text();
   const backend = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8000";
   try {
     const res = await fetch(`${backend}/api/v1/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body,
     });
-    const data = await res.json();
-    return NextResponse.json(data, { status: res.status });
+    const data = await res.text();
+    return new Response(data, {
+      status: res.status,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err) {
-    // Fallback stub when backend is unreachable or errors
-    const stub = {
-      server_name: "generated_server_stub",
-      generated_code: "# Stubbed generated code\nprint('hello from stub')",
-      note: "Returned stub because backend call failed",
-    };
-    return NextResponse.json(stub, { status: 200 });
+    return Response.json({
+      error: "backend_unreachable",
+      message: "Failed to reach backend generate endpoint.",
+    }, {
+      status: 502,
+    });
   }
 }

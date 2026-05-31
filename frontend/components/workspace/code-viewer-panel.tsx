@@ -57,9 +57,25 @@ export function CodeViewerPanel() {
       </pre>
 
       <div className="deploy-strip">
-        <a className="primary-cta inline-cta" href="/sandbox">
+        <button
+          className="primary-cta inline-cta"
+          type="button"
+          onClick={async () => {
+            try {
+              await fetch(`/api/v1/preview/deploy`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ server_name: "deployed-server", generated_code: code }),
+              });
+              // navigate to sandbox after deploy
+              window.location.href = "/sandbox";
+            } catch (e) {
+              console.error("deploy failed", e);
+            }
+          }}
+        >
           Deploy to Sandbox
-        </a>
+        </button>
       </div>
     </article>
   );

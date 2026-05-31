@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import eventStore from "../../../lib/eventStore";
 
-export default function SandboxPage({ params }: { params: { id: string } }) {
-  const serverId = params.id;
+export default function SandboxPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: serverId } = use(params);
   const [timeline, setTimeline] = useState<Array<{line:string, ts:number}>>([]);
   const [replaying, setReplaying] = useState(false);
   const router = useRouter();

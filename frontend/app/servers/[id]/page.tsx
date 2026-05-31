@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { use, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import eventStore from "../../../lib/eventStore";
 
-export default function ServerPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default function ServerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [server, setServer] = useState<any>(null);
   const [health, setHealth] = useState<any>(null);
   const [logs, setLogs] = useState<string>("");
@@ -38,7 +38,7 @@ export default function ServerPage({ params }: { params: { id: string } }) {
               fetch(`/api/v1/servers/${id}/events`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ line: ln, ts: Date.now(), type: "log" }),
+                body: globalThis.JSON.stringify({ line: ln, ts: Date.now(), type: "log" }),
               });
             } catch (err) {}
           }
@@ -75,7 +75,7 @@ export default function ServerPage({ params }: { params: { id: string } }) {
           fetch(`/api/v1/servers/${id}/events`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ line: e.data, ts: Date.now(), type: "log" }),
+            body: globalThis.JSON.stringify({ line: e.data, ts: Date.now(), type: "log" }),
           });
         } catch (err) {}
       };
@@ -158,7 +158,7 @@ export default function ServerPage({ params }: { params: { id: string } }) {
 
       <div style={{ marginTop: 16 }}>
         <h4>Health</h4>
-        <pre>{JSON.stringify(health, null, 2)}</pre>
+        <pre>{globalThis.JSON.stringify(health, null, 2)}</pre>
       </div>
 
       <div style={{ marginTop: 16 }}>
