@@ -133,28 +133,49 @@ This repo is set up for a split deployment:
 - Backend on Render.
 - Frontend on Vercel.
 
+The frontend path is already working on Vercel. The remaining deployment steps are for the backend on Render.
+
 ### Render backend
 
-Use the `backend/` directory as the root directory.
+Use the `backend/` directory as the root directory, or import the included [`render.yaml`](render.yaml) blueprint.
 
-Suggested settings:
+Render should use Python 3.12.x for this service. The backend includes [`backend/runtime.txt`](backend/runtime.txt) to pin a stable runtime.
 
-- Build command: `pip install -r requirements.txt`
-- Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- Environment variables:
-  - `CORS_ORIGINS=*` or your Vercel domain
-  - `GROQ_API_KEY` if you want Groq generation
-  - `LLM_PROVIDER=groq`
-  - `GROQ_MODEL=llama-3.1-8b-instant`
+Recommended Render setup:
+
+1. Create a new **Web Service** on Render.
+2. Connect the GitHub repository.
+3. Set the root directory to `backend/`.
+4. Use the following values:
+
+```text
+Build command: pip install -r requirements.txt
+Start command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+5. Add these environment variables:
+
+```text
+CORS_ORIGINS=*
+LLM_PROVIDER=groq
+GROQ_MODEL=llama-3.1-8b-instant
+GROQ_API_KEY=your-key-here
+```
+
+6. Deploy the service and copy the Render URL.
+
+If you want to restrict browser access, replace `CORS_ORIGINS=*` with your Vercel domain.
 
 ### Vercel frontend
 
 Use the `frontend/` directory as the root directory.
 
-Suggested settings:
+Suggested Vercel settings:
 
 - Framework preset: Next.js
 - Environment variable: `NEXT_PUBLIC_BACKEND_URL=https://your-render-service.onrender.com`
+
+After the backend is deployed, update `NEXT_PUBLIC_BACKEND_URL` to the Render service URL and redeploy the frontend if needed.
 
 A sample frontend env file is included at [frontend/.env.example](frontend/.env.example).
 
