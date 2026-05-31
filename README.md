@@ -1,122 +1,208 @@
 # AgentBridge AI
 
-AgentBridge AI is a local web application for generating MCP servers from plain English prompts. The current app has a public landing page, a workspace dashboard, a generator UI, and a FastAPI backend that can return generated code as JSON or as a ZIP file.
+AgentBridge AI is a full-stack application for turning plain-English prompts into MCP-style FastAPI services, previewing the generated output, and running live sandbox analysis against the deployed result.
 
-## Project layout
+The active deployment stack is:
 
-- `frontend/` - Next.js 15 app with the landing page, workspace, generator, deploy, and sandbox routes
-- `backend/` - FastAPI service that exposes generation and health endpoints
-- `docker/` - Docker secret files and helper images
-- `docker-compose.yml` - Local stack for PostgreSQL, Redis, API, and web
+- `frontend/` - Next.js app with the landing page, generator, workspace, deploy flow, sandbox UI, and server detail pages.
+- `backend/` - FastAPI service that generates code, stores preview state, serves sandbox APIs, and exposes MCP-style tool routes.
+
+## What the application does
+
+- Accepts a prompt describing the server you want.
+- Calls the configured LLM provider, or a local fallback when Groq is unavailable.
+- Produces MCP-compatible FastAPI code.
+- Lets you deploy the generated code into the preview/sandbox flow.
+- Starts a live sandbox session and streams structured agent analysis over WebSocket.
+- Renders the final analysis as readable paragraphs instead of a single long line.
+
+## Core features
+
+- Prompt-to-code generation with Groq support.
+- Local fallback generation so demos still work when the LLM is unavailable.
+- Deploy preview endpoint to store the latest generated artifact.
+- Live sandbox session with WebSocket updates.
+- Structured final output with `summary`, `paragraphs`, and `raw` fields.
+- MCP tool discovery and tool calls for calculator-style demo actions.
+- Render and Vercel deployment support.
+
+## Repository layout
+
+- `frontend/` - Next.js application and UI components.
+- `backend/` - FastAPI API, sandbox orchestrator, generation services, and MCP templates.
+- `docker/` - Docker helper files and secrets.
+- `docs/` - Protocol and supporting documentation.
+- `render.yaml` - Render blueprint for the backend.
+- `docker-compose.yml` - Local stack for the broader workspace.
 
 ## Prerequisites
 
-- Node.js 18+ and pnpm
-- Python 3.12+
-- Docker Desktop if you want the compose stack
+- Node.js 18 or newer.
+- Python 3.12 or newer.
+- pnpm.
+- Docker Desktop if you want to use the compose stack.
 
-## Local setup
+## Environment variables
 
-Install frontend dependencies:
+### Frontend
+
+The frontend expects the backend URL through `NEXT_PUBLIC_BACKEND_URL`.
+
+Example:
+
+```bash
+NEXT_PUBLIC_BACKEND_URL=https://your-backend.onrender.com
+```
+
+### Backend
+
+The backend reads:
+
+- `GROQ_API_KEY`
+- `GROQ_API_URL`
+- `GROQ_MODEL`
+- `LLM_PROVIDER`
+- `CORS_ORIGINS`
+
+For deployment, `CORS_ORIGINS` should include your Vercel domain or `*` if you want permissive cross-origin access.
+
+## Local development
+
+### 1. Install frontend dependencies
 
 ```powershell
 Set-Location 'D:\Agent Bridge\frontend'
 pnpm install
 ```
 
-Install backend dependencies:
+### 2. Install backend dependencies
 
 ```powershell
 Set-Location 'D:\Agent Bridge\backend'
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-## Run locally
+### 3. Start the backend
 
-Start the frontend:
+```powershell
+Set-Location 'D:\Agent Bridge\backend'
+python -m uvicorn app.main:app --reload --port 8000
+```
+
+### 4. Start the frontend
 
 ```powershell
 Set-Location 'D:\Agent Bridge\frontend'
 pnpm dev
 ```
 
-Start the backend:
+If the frontend cannot reach the backend, set `NEXT_PUBLIC_BACKEND_URL` in `frontend/.env.local`.
 
-```powershell
-Set-Location 'D:\Agent Bridge\backend'
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
-```
+## Local Docker stack
 
-## Docker Compose
-
-To run the full stack with PostgreSQL and Redis:
+The workspace includes a compose file for the local stack.
 
 ```powershell
 Set-Location 'D:\Agent Bridge'
 docker compose up --build
 ```
 
-If you want Groq-backed generation in Docker, put your raw API key in `docker/secrets/groq_api_key` before starting the stack.
-
-If Groq is unavailable (missing key, invalid key, network issue, or API error), the backend returns a local stub response so the demo can keep running.
+If you want Groq-backed generation in Docker, place your API key in `docker/secrets/groq_api_key`.
 
 ## Deployment
 
 This repo is set up for a split deployment:
 
-- Backend on Render from the `backend/` folder.
-- Frontend on Vercel from the `frontend/` folder.
+- Backend on Render.
+- Frontend on Vercel.
 
-Render backend settings:
+### Render backend
+
+Use the `backend/` directory as the root directory.
+
+Suggested settings:
 
 - Build command: `pip install -r requirements.txt`
 - Start command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-- `CORS_ORIGINS`: set to `*` or your Vercel domain
-- `GROQ_API_KEY`: set in Render secrets if you want Groq-backed generation
+- Environment variables:
+  - `CORS_ORIGINS=*` or your Vercel domain
+  - `GROQ_API_KEY` if you want Groq generation
+  - `LLM_PROVIDER=groq`
+  - `GROQ_MODEL=llama-3.1-8b-instant`
 
-Vercel frontend settings:
+### Vercel frontend
 
-- Root directory: `frontend`
+Use the `frontend/` directory as the root directory.
+
+Suggested settings:
+
 - Framework preset: Next.js
-- Environment variable: `NEXT_PUBLIC_BACKEND_URL` pointing to the Render backend URL
+- Environment variable: `NEXT_PUBLIC_BACKEND_URL=https://your-render-service.onrender.com`
 
-For local development, copy `frontend/.env.example` to `frontend/.env.local` and set `NEXT_PUBLIC_BACKEND_URL` to your local backend URL.
+A sample frontend env file is included at [frontend/.env.example](frontend/.env.example).
 
-## Frontend routes
+## Application routes
 
-- `/` - landing page
-- `/workspace` - dashboard workspace
-- `/generator` - generator page
-- `/deploy` - deployment helper page
-- `/sandbox` - sandbox landing page
-- `/sandbox/[id]` - sandbox detail page
-- `/servers/[id]` - server detail page
+### Frontend
 
-## Backend API
+- `/` - public landing page.
+- `/workspace` - main workspace dashboard.
+- `/generator` - prompt-to-code generator.
+- `/deploy` - deployment helper page.
+- `/sandbox` - sandbox landing page.
+- `/sandbox/[id]` - sandbox session detail view.
+- `/servers/[id]` - server detail view.
 
-- `GET /health` - health check
-- `POST /api/generate` - generate MCP code from `prompt` or `description`
-- `POST /api/generate-mcp` - alias for the generation endpoint
-- `POST /api/generate?download=zip` - return a ZIP bundle instead of JSON
-- `POST /_echo` - debug endpoint that echoes the raw request body
+### Backend API
 
-## Environment variables
+- `GET /health` - health check.
+- `POST /api/generate` - generate MCP code from `prompt` or `description`.
+- `POST /api/generate-mcp` - alias for generation.
+- `POST /api/generate?download=zip` - return a ZIP bundle.
+- `POST /api/v1/preview/deploy` - store the latest generated code for preview/sandbox flows.
+- `GET /api/v1/preview` - return the latest preview metadata.
+- `GET /api/v1/tools/list` - list discovered MCP tools.
+- `POST /api/v1/tools/call` - call supported MCP demo tools.
+- `POST /api/v1/sandbox/start` - create a sandbox session.
+- `GET /api/v1/sandbox/{session_id}/events` - return stored sandbox events.
+- `GET /api/v1/sandbox/{session_id}/replay` - replay a stored sandbox session.
+- `POST /api/v1/sandbox/command` - broadcast a sandbox command to active sessions.
+- `GET /api/v1/ws/sandbox/{session_id}` - WebSocket stream for live sandbox events.
 
-The backend reads `GROQ_API_KEY`, `GROQ_API_URL`, `GROQ_MODEL`, and `LLM_PROVIDER` from the root `.env` file or from the Docker secret mount. The compose stack also injects `DATABASE_URL` and `CORS_ORIGINS` for the API service.
+## Protocol notes
+
+The sandbox emits structured WebSocket messages. The most important event shapes are documented in [docs/agent_protocol.md](docs/agent_protocol.md).
+
+Key fields to expect:
+
+- `agent:analysis` events contain `result.summary` and `result.detail`.
+- `final` events contain `result.summary`, `result.paragraphs`, and `result.raw`.
 
 ## Validation
 
-The frontend build is expected to pass with:
+Frontend build:
 
 ```powershell
 Set-Location 'D:\Agent Bridge\frontend'
 pnpm build
 ```
 
-The backend smoke tests are expected to pass with:
+Backend tests:
 
 ```powershell
 Set-Location 'D:\Agent Bridge\backend'
-.\.venv\Scripts\python.exe -m pytest -q
+python -m pytest -q
 ```
 
+## Troubleshooting
+
+- If the frontend shows stale backend data, make sure `NEXT_PUBLIC_BACKEND_URL` points to the deployed Render service.
+- If the backend rejects browser requests, update `CORS_ORIGINS` on Render.
+- If Groq is unavailable, the backend falls back to a local stub so the demo can continue.
+- If the sandbox trace looks like one long line, the frontend is expected to format `final.paragraphs` as separate paragraphs.
+
+## Related files
+
+- [render.yaml](render.yaml) - Render deployment blueprint.
+- [frontend/.env.example](frontend/.env.example) - frontend environment example.
+- [docs/agent_protocol.md](docs/agent_protocol.md) - sandbox event protocol.
