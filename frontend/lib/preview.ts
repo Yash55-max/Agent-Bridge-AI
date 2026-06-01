@@ -27,7 +27,7 @@ export const sidebarItems: SidebarItem[] = [
   { label: "Workspace", active: true, icon: "folder", href: "/workspace" },
   { label: "Sandbox", active: false, icon: "server", href: "/sandbox" },
   { label: "Deploy", active: false, icon: "robot", href: "/deploy" },
-  { label: "Docs", active: false, icon: "gear", href: "/workspace#docs" },
+  { label: "Docs", active: false, icon: "gear", href: "/docs" },
 ];
 
 export const agentCards: AgentCard[] = [

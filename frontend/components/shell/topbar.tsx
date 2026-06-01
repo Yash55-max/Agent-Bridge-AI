@@ -21,7 +21,9 @@ export function Topbar({ activePath }: { activePath?: string }) {
         <Link className={activePath === "/deploy" ? "active" : ""} href="/deploy">
           Deploy
         </Link>
-        <Link href="/workspace#docs">Docs</Link>
+        <Link className={activePath === "/docs" ? "active" : ""} href="/docs">
+          Docs
+        </Link>
       </nav>
 
       <div className="topbar-actions">

@@ -14,6 +14,12 @@ The active deployment stack is:
 - `frontend/` - Next.js app with the landing page, generator, workspace, deploy flow, sandbox UI, and server detail pages.
 - `backend/` - FastAPI service that generates code, stores preview state, serves sandbox APIs, and exposes MCP-style tool routes.
 
+## In-app documentation
+
+The app includes a dedicated docs page at `/docs` that explains the workflow, API surface, environment variables, deployment setup, and sandbox event protocol.
+
+Use it when you want the current product behavior in a glanceable format instead of reading raw source files.
+
 ## What the application does
 
 - Accepts a prompt describing the server you want.
@@ -185,6 +191,7 @@ A sample frontend env file is included at [frontend/.env.example](frontend/.env.
 
 - `/` - public landing page.
 - `/workspace` - main workspace dashboard.
+- `/docs` - in-app product documentation and API reference.
 - `/generator` - prompt-to-code generator.
 - `/deploy` - deployment helper page.
 - `/sandbox` - sandbox landing page.
