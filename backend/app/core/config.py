@@ -21,7 +21,7 @@ def _find_env_file() -> str:
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=_find_env_file(), extra="ignore")
+    model_config = SettingsConfigDict(env_file=_find_env_file(), extra="ignore", enable_decoding=False)
 
     app_name: str = "AgentBridge AI API"
     app_version: str = "0.1.0"
