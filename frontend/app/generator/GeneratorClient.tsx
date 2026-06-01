@@ -41,26 +41,39 @@ export default function GeneratorClient() {
   }
 
   return (
-    <div style={{ padding: 16 }}>
-      <h2>Generator</h2>
-      <form onSubmit={handleSubmit}>
+    <section className="generator-client">
+      <header className="generator-client-head">
+        <div>
+          <p className="section-label">Generator</p>
+          <h3>Natural language prompt</h3>
+        </div>
+        <p className="generator-hint">Write one clear request. The backend will format the result into MCP-ready FastAPI code.</p>
+      </header>
+
+      <form className="generator-form" onSubmit={handleSubmit}>
+        <label className="field-label" htmlFor="mcp-description">
+          What should the MCP server do?
+        </label>
         <textarea
+          id="mcp-description"
           rows={6}
-          style={{ width: "100%" }}
           placeholder="Describe the MCP server you want..."
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <div style={{ marginTop: 8 }}>
-          <button type="submit" disabled={loading}>
+        <div className="generator-actions">
+          <button className="primary-cta generator-submit" type="submit" disabled={loading}>
             {loading ? "Generating…" : "Generate"}
           </button>
         </div>
       </form>
 
       {result ? (
-        <pre style={{ marginTop: 12, maxHeight: 320, overflow: "auto" }}>{result}</pre>
+        <section className="generator-result" aria-live="polite">
+          <p className="section-label">Latest output</p>
+          <pre>{result}</pre>
+        </section>
       ) : null}
-    </div>
+    </section>
   );
 }

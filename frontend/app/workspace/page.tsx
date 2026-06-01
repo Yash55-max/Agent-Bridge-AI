@@ -10,19 +10,23 @@ export default async function WorkspacePage() {
   const preview = await loadPreview();
 
   return (
-    <main className="shell">
+    <main className="shell workspace-shell">
       <Topbar activePath="/workspace" />
 
-      <section className="workspace" id="workspace">
+      <section className="workspace workspace-grid" id="workspace" aria-label="Workspace">
         <Sidebar activePath="/workspace" items={sidebarItems} />
 
-        <section className="center-pane">
+        <section className="workspace-main" aria-label="Generator workspace">
           <GeneratorPanel />
-          <HealthPanel status={preview.status} sandbox={preview.sandbox} />
-          <OutputPanel />
         </section>
 
-        <SandboxPanel title="Live Agent Sandbox" agents={agentCards} preview={preview} />
+        <aside className="workspace-status" aria-label="Workspace status">
+          <div className="workspace-status-sticky">
+            <HealthPanel status={preview.status} sandbox={preview.sandbox} />
+            <OutputPanel />
+            <SandboxPanel title="Live Agent Sandbox" agents={agentCards} preview={preview} />
+          </div>
+        </aside>
       </section>
     </main>
   );

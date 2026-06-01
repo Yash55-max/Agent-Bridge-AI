@@ -36,13 +36,13 @@ export function CodeViewerPanel() {
   }
 
   return (
-    <article className="panel code-panel-shell">
-      <header className="panel-header compact">
+    <article className="panel code-panel-shell workspace-card workspace-card-surface">
+      <header className="panel-header compact code-panel-header">
         <div>
           <p className="section-label">Code Viewer</p>
-          <h3>Generated FastAPI/Python</h3>
+          <h3>Generated FastAPI / Python</h3>
         </div>
-        <div className="panel-actions">
+        <div className="panel-actions code-panel-actions">
           <button className="snippet-button" type="button" onClick={copyCode} aria-label="Copy code">
             Copy Code
           </button>

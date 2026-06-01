@@ -6,9 +6,12 @@ export function HealthPanel({
   sandbox: { agents: number; latencyMs: number };
 }) {
   return (
-    <article className="panel health-panel">
+    <article className="panel health-panel workspace-card workspace-card-surface">
       <header className="panel-header compact">
-        <h3>System Health</h3>
+        <div>
+          <p className="section-label">System Health</p>
+          <h3>Runtime status</h3>
+        </div>
       </header>
 
       <div className="health-grid">
