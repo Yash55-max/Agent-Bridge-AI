@@ -9,7 +9,7 @@
 
 AgentBridge AI is a full-stack application for turning plain-English prompts into MCP-style FastAPI services, previewing the generated output, and running live sandbox analysis against the deployed result.
 
-The active deployment stack is:
+The active deployment stack is :
 
 - `frontend/` - Next.js app with the landing page, generator, workspace, deploy flow, sandbox UI, and server detail pages.
 - `backend/` - FastAPI service that generates code, stores preview state, serves sandbox APIs, and exposes MCP-style tool routes.
